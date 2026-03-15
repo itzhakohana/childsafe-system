@@ -56,3 +56,43 @@ childsafe-system
 │   └── test_engine_confirmation.py
 │
 └── .gitignore
+```
+
+---
+
+# System Architecture
+
+```
+Car Sensors
+   │
+   ▼
+SensorEvent
+   │
+   ▼
+MonitoringEngine
+   │
+   ▼
+StateMachine
+   │
+   ├── WARNING → Warning Actions
+   │
+   └── DANGER → Emergency Actions
+            │
+            ▼
+       WebhookDispatcher
+            │
+            ▼
+           n8n
+```
+
+This architecture separates the **decision engine**, **state machine**, and **external integrations**, making the system modular and easy to test.
+
+---
+
+# Author
+
+Yitzhak Ohana  
+Computer Science Student – Lev Academic Center (JCT)
+
+GitHub:  
+https://github.com/itzhakohana
