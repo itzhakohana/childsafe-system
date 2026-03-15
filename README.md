@@ -1,5 +1,10 @@
 # ChildSafe System
 
+
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Status](https://img.shields.io/badge/status-prototype-orange)
+
 A Python prototype of an in-vehicle child safety monitoring system.
 
 The system simulates a smart safety unit installed in a vehicle that detects dangerous cabin conditions when a child might be left inside a locked car.
