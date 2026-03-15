@@ -101,3 +101,24 @@ Computer Science Student – Lev Academic Center (JCT)
 
 GitHub:  
 https://github.com/itzhakohana
+
+---
+
+# Running the Simulation
+
+Example:
+
+python -m src.main simulate --scenario summer
+
+or
+
+python -m src.main simulate --scenario winter
+
+---
+
+# Running Tests
+
+Run all unit tests:
+
+python -m unittest discover -s tests -v
+
