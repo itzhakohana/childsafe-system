@@ -76,7 +76,8 @@ Engine --> StateMachine
 StateMachine --> WarningActions
 StateMachine --> DangerActions
 DangerActions --> WebhookDispatcher
-WebhookDispatcher --> n8n
+WebhookDispatcher --> n8n_system
+```
 
 [View architecture notes](docs/architecture.md)
 ```
