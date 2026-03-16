@@ -67,6 +67,7 @@ childsafe-system
 
 # System Architecture
 
+[View architecture notes](docs/architecture.md)
 ```
 Car Sensors
    │
