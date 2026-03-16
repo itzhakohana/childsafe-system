@@ -67,6 +67,17 @@ childsafe-system
 
 # System Architecture
 
+```mermaid
+flowchart TD
+
+Sensors --> Simulator
+Simulator --> Engine
+Engine --> StateMachine
+StateMachine --> WarningActions
+StateMachine --> DangerActions
+DangerActions --> WebhookDispatcher
+WebhookDispatcher --> n8n
+
 [View architecture notes](docs/architecture.md)
 ```
 Car Sensors
