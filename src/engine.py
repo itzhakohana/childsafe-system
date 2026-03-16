@@ -75,20 +75,21 @@ def evaluate_conditions(
             dominant_kind = DangerKind.CO2
 
     # Rate checks
+    # Fast-rising signals should create an early WARNING,
+    # but not trigger DANGER by themselves.
     if co2_rate >= config.CO2_RATE_DANGER_PPM_PER_MIN:
-        danger_condition = True
-        reasons.append(f"CO2 rising fast")
+        warning_condition = True
+        reasons.append("CO2 rising fast")
 
         if dominant_kind is None:
             dominant_kind = DangerKind.RATE
 
     if temp_rate >= config.TEMP_RATE_DANGER_C_PER_MIN:
-        danger_condition = True
-        reasons.append(f"Temp rising fast")
+        warning_condition = True
+        reasons.append("Temp rising fast")
 
         if dominant_kind is None:
             dominant_kind = DangerKind.RATE
-
     if danger_condition:
         warning_condition = True
 

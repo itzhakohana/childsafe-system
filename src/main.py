@@ -83,7 +83,11 @@ def build_parser():
 
     sim = sub.add_parser("simulate")
 
-    sim.add_argument("--scenario", choices=["summer", "winter"], required=True)
+    sim.add_argument(
+        "--scenario",
+        choices=["summer", "winter", "forgotten_child_hot_day"],
+        required=True,
+    )
 
     sim.add_argument("--seed", type=int, default=42)
 
@@ -106,7 +110,6 @@ def build_parser():
     rep.set_defaults(func=cmd_replay)
 
     return parser
-
 
 def main():
 

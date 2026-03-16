@@ -139,15 +139,21 @@ class TestInactivePreventsActions(unittest.TestCase):
 
     def test_inactive_clears_confirmation_timer(self):
         temp = config.TEMP_WARNING_C + 1.0
+
         for i in range(2):
             self.engine.tick(_locked_event(i * 5, temp, 800))
 
         for i in range(5):
             self.engine.tick(_inactive_event(10 + i * 5))
 
-        result = self.engine.tick(_locked_event(40, temp, 800))
+        ev = _locked_event(40, temp, 800)
+
+      
+
+        result = self.engine.tick(ev)
+
+       
+
         self.assertEqual(result.state, SystemState.NORMAL)
-
-
 if __name__ == "__main__":
     unittest.main()

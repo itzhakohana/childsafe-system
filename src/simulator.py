@@ -2,8 +2,10 @@
 ChildSafe System — Scenario Simulator
 Generates realistic sensor event sequences for summer and winter scenarios.
 """
-
 from __future__ import annotations
+
+
+from .car_simulation import CarEnvironment
 import random
 import math
 from typing import List
@@ -17,7 +19,49 @@ def _clamp(value: float, lo: float, hi: float) -> float:
 
 def _lerp(a: float, b: float, t: float) -> float:
     return a + (b - a) * t
+def generate_forgotten_child_hot_day(
+    seed: int,
+    step_seconds: int,
+    duration_minutes: int,
+) -> List[SensorEvent]:
+    """
+    Simulates a dangerous hot day scenario:
+    child left in a locked car, heat and CO2 gradually rise.
+    """
+    env = CarEnvironment(
+        outside_temp_c=34.0,
+        cabin_temp_c=28.0,
+        co2_ppm=500,
+        child_present=True,
+        windows_open_pct=0,
+        ac_on=False,
+        heater_on=False,
+        car_locked=True,
+        engine_on=False,
+        sunlight_factor=1.0,
+    )
 
+    events: List[SensorEvent] = []
+    total_steps = (duration_minutes * 60) // step_seconds
+
+    for i in range(total_steps):
+        ts = i * step_seconds
+
+        if i > 0:
+            env.step(step_seconds)
+
+        events.append(
+            SensorEvent(
+                timestamp_sec=ts,
+                car_locked=env.car_locked,
+                engine_on=env.engine_on,
+                cabin_temp_c=round(_clamp(env.cabin_temp_c, -50.0, 80.0), 2),
+                co2_ppm=max(400, int(env.co2_ppm)),
+            )
+        )
+
+    return events
+  
 
 def generate_summer(
     seed: int,
@@ -126,6 +170,7 @@ def generate_winter(
 SCENARIOS = {
     "summer": generate_summer,
     "winter": generate_winter,
+    "forgotten_child_hot_day": generate_forgotten_child_hot_day,
 }
 
 

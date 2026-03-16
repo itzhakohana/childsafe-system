@@ -81,7 +81,7 @@ class StateMachine:
         if elapsed >= config.CONFIRM_WARNING_SECONDS:
             return SystemState.WARNING
 
-        return SystemState.NORMAL if self._state == SystemState.NORMAL else self._state
+        return SystemState.NORMAL 
 
     def _handle_danger(self, timestamp_sec: int) -> SystemState:
 
