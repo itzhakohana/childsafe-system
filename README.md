@@ -38,7 +38,7 @@ and triggers appropriate safety actions.
   - trigger alarm and hazard lights
   - send mobile alert
 - Simulation engine for testing different scenarios
-- Webhook integration (n8n ready)
+- Real webhook integration with n8n
 - Unit tests for core safety logic
 
 ---
@@ -49,16 +49,22 @@ and triggers appropriate safety actions.
 childsafe-system
 │
 ├── src
+│   ├── main.py
 │   ├── engine.py
 │   ├── simulator.py
+│   ├── car_simulation.py
 │   ├── actions.py
+│   ├── integrations.py
+│   ├── io_csv.py
 │   ├── models.py
 │   ├── state.py
+│   ├── utils.py
 │   └── config.py
 │
 ├── tests
 │   ├── test_engine_thresholds.py
-│   └── test_engine_confirmation.py
+│   ├── test_engine_confirmation.py
+│   └── test_integrations.py
 │
 └── .gitignore
 ```
@@ -86,19 +92,13 @@ Example simulation run:
 
 python -m src.main simulate --scenario summer
 
-Example output:
+Example flow:
 
-Temperature: 42°C
-CO2: 2800 ppm
-
-State transition:
-NORMAL → WARNING → DANGER
-
-Actions triggered:
-• Open windows
-• Activate AC
-• Trigger alarm
-• Send mobile alert
+- System starts in `INACTIVE`
+- Moves to `NORMAL` when the car becomes locked and the engine is off
+- Escalates to `WARNING`
+- Escalates to `DANGER`
+- Triggers simulated in-car actions and optional webhook notifications
 
 This simulation demonstrates how the monitoring engine detects dangerous cabin conditions and escalates safety responses automatically.
 
@@ -150,6 +150,13 @@ or
 
 python -m src.main simulate --scenario winter
 
+If you run `src/main.py` directly from Visual Studio with no command-line arguments,
+the project defaults to:
+
+```text
+simulate --scenario summer
+```
+
 You can also send alerts to a real n8n webhook:
 
 ```powershell
@@ -169,6 +176,42 @@ Available webhook configuration:
 - `CHILDSAFE_N8N_WEBHOOK_TIMEOUT_SECONDS`
 - `CHILDSAFE_N8N_WEBHOOK_SOURCE`
 - `CHILDSAFE_ENABLE_N8N_WEBHOOK`
+
+---
+
+# Local n8n Setup
+
+Install Node.js, then install and run n8n locally:
+
+```powershell
+npm install -g n8n
+n8n
+```
+
+Then open:
+
+```text
+http://localhost:5678
+```
+
+Create a workflow with a `Webhook` node configured as:
+
+- Method: `POST`
+- Path: `childsafe-alert`
+
+For one-time testing, use the test URL:
+
+```powershell
+$env:CHILDSAFE_N8N_WEBHOOK_URL="http://localhost:5678/webhook-test/childsafe-alert"
+python -m src.main test-webhook
+```
+
+For full simulation runs, publish the workflow in n8n and use the production URL:
+
+```powershell
+$env:CHILDSAFE_N8N_WEBHOOK_URL="http://localhost:5678/webhook/childsafe-alert"
+python -m src.main simulate --scenario summer
+```
 
 ---
 
