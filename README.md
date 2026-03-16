@@ -79,6 +79,29 @@ DangerActions --> WebhookDispatcher
 WebhookDispatcher --> n8n_system
 ```
 
+
+# Demo
+
+Example simulation run:
+
+python -m src.main simulate --scenario summer
+
+Example output:
+
+Temperature: 42°C
+CO2: 2800 ppm
+
+State transition:
+NORMAL → WARNING → DANGER
+
+Actions triggered:
+• Open windows
+• Activate AC
+• Trigger alarm
+• Send mobile alert
+
+This simulation demonstrates how the monitoring engine detects dangerous cabin conditions and escalates safety responses automatically.
+
 [View architecture notes](docs/architecture.md)
 ```
 Car Sensors
