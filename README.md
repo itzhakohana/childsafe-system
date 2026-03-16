@@ -150,6 +150,26 @@ or
 
 python -m src.main simulate --scenario winter
 
+You can also send alerts to a real n8n webhook:
+
+```powershell
+$env:CHILDSAFE_N8N_WEBHOOK_URL="https://your-n8n-host/webhook/childsafe"
+python -m src.main simulate --scenario summer
+```
+
+To verify the webhook connection without a full simulation:
+
+```powershell
+python -m src.main test-webhook --webhook-url "https://your-n8n-host/webhook/childsafe"
+```
+
+Available webhook configuration:
+
+- `CHILDSAFE_N8N_WEBHOOK_URL`
+- `CHILDSAFE_N8N_WEBHOOK_TIMEOUT_SECONDS`
+- `CHILDSAFE_N8N_WEBHOOK_SOURCE`
+- `CHILDSAFE_ENABLE_N8N_WEBHOOK`
+
 ---
 
 # Running Tests

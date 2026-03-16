@@ -4,3 +4,7 @@ logs/
 .env
 .vscode/
 .idea/
+/.vs/childsafe-system
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json

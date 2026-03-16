@@ -12,7 +12,7 @@ import urllib.request
 import urllib.error
 from typing import Optional
 
-from src.models import EvalResult, SystemState
+from src.models import DangerKind, EvalResult, SystemState
 from src import config
 
 
@@ -21,14 +21,44 @@ def build_payload(event_type: str, result: EvalResult) -> dict:
     ev = result.enriched.event
 
     return {
-        "source": "childsafe-prototype",
+        "source": config.N8N_WEBHOOK_SOURCE,
         "event_type": event_type,
         "timestamp_sec": ev.timestamp_sec,
         "state": result.state.value,
+        "state_changed": result.state_changed,
         "cabin_temp_c": ev.cabin_temp_c,
         "co2_ppm": ev.co2_ppm,
+        "temp_rate_c_per_min": result.enriched.temp_rate_c_per_min,
+        "co2_rate_ppm_per_min": result.enriched.co2_rate_ppm_per_min,
+        "car_locked": ev.car_locked,
+        "engine_on": ev.engine_on,
+        "danger_kind": (
+            result.danger_kind.name.lower()
+            if isinstance(result.danger_kind, DangerKind)
+            else None
+        ),
         "reasons": list(result.reasons),
         "actions_triggered": list(result.actions_fired),
+    }
+
+
+def build_test_payload() -> dict:
+
+    return {
+        "source": config.N8N_WEBHOOK_SOURCE,
+        "event_type": "manual_test",
+        "timestamp_sec": 0,
+        "state": SystemState.WARNING.value,
+        "state_changed": True,
+        "cabin_temp_c": 37.5,
+        "co2_ppm": 1650,
+        "temp_rate_c_per_min": 1.8,
+        "co2_rate_ppm_per_min": 220.0,
+        "car_locked": True,
+        "engine_on": False,
+        "danger_kind": "heat",
+        "reasons": ["manual_webhook_test"],
+        "actions_triggered": ["WARNING_ACTIONS"],
     }
 
 
@@ -42,8 +72,13 @@ def send_n8n_event(
     timeout = timeout if timeout is not None else config.N8N_WEBHOOK_TIMEOUT_SECONDS
 
     if not url or not url.strip():
-        print("\n[N8N] Dry-run payload:")
-        print(json.dumps(payload, indent=2))
+        event_type = payload.get("event_type", "unknown_event")
+        state = payload.get("state", "UNKNOWN")
+        timestamp_sec = payload.get("timestamp_sec", 0)
+        print(
+            f"           Webhook: Preview only ({event_type} | "
+            f"state={state} | t={timestamp_sec}s)"
+        )
         return False
 
     body_bytes = json.dumps(payload).encode("utf-8")
@@ -85,10 +120,17 @@ class WebhookDispatcher:
 
     _ELEVATED = frozenset({SystemState.WARNING, SystemState.DANGER})
 
-    def __init__(self, disable_webhook: bool = False):
+    def __init__(
+        self,
+        disable_webhook: bool = False,
+        webhook_url: Optional[str] = None,
+        webhook_timeout: Optional[int] = None,
+    ):
 
         self._prev_state: Optional[SystemState] = None
         self._disable_webhook = disable_webhook
+        self._webhook_url = webhook_url
+        self._webhook_timeout = webhook_timeout
 
         self._elevated_entry_sent = False
         self._reset_sent = False
@@ -128,4 +170,8 @@ class WebhookDispatcher:
         if event_type is not None:
 
             payload = build_payload(event_type, result)
-            send_n8n_event(payload)
+            send_n8n_event(
+                payload,
+                webhook_url=self._webhook_url,
+                timeout=self._webhook_timeout,
+            )
